@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'all_products_page.dart';
 
 void main() {
-  runApp(const FigmaToCodeApp());
+  runApp(const MyApp());
 }
 
-class FigmaToCodeApp extends StatelessWidget {
-  const FigmaToCodeApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,17 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode(); // FocusNode 추가
   bool _isSearchActive = false;
+  bool _showRecentSearches = false; // 최근 검색어 표시 여부
+
+  List<String> recentSearches = [
+    'Smartphone',
+    'Laptop',
+    'Headphones',
+    'Camera',
+    'Sneakers',
+  ]; // 예시로 넣은 최근 검색어
 
   void _onSearchChanged(String value) {
     setState(() {
@@ -78,72 +89,148 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // 텍스트 필드에 포커스가 생기면 최근 검색어를 표시
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        setState(() {
+          _showRecentSearches = true;
+        });
+      } else {
+        setState(() {
+          _showRecentSearches = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose(); // FocusNode 해제
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Container(
-              height: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: ShapeDecoration(
-                color: const Color(0xFFFAFAFA),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          height: 50,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  height: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFFAFAFA),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          focusNode: _focusNode, // FocusNode 적용
+                          style: TextStyle(color: Colors.black),
+                          controller: _controller,
+                          onChanged: _onSearchChanged,
+                          decoration: InputDecoration(
+                            hintText: '제품을 검색하시오',
+                            hintStyle: TextStyle(
+                              color: Color(0xFFC4C5C4),
+                              fontSize: 14,
+                              fontFamily: 'DM Sans',
+                              fontWeight: FontWeight.w500,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          elevation: 0,
+                          backgroundColor: Colors.transparent,
+                        ),
+                        onPressed: _isSearchActive
+                            ? () {
+                          print('Searching for: ${_controller.text}');
+                        }
+                            : null,
+                        child: const Icon(
+                          Icons.search,
+                          color: Color(0xFF3669C9),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      style: TextStyle(color: Colors.black),
-                      controller: _controller,
-                      onChanged: _onSearchChanged,
-                      decoration: InputDecoration(
-                        hintText: '제품을 검색하시오',
-                        hintStyle: TextStyle(
-                          color: Color(0xFFC4C5C4),
-                          fontSize: 14,
-                          fontFamily: 'DM Sans',
-                          fontWeight: FontWeight.w500,
-                        ),
-                        border: InputBorder.none,
-                      ),
+            ],
+          ),
+        ),
+
+        // 최근 검색어 리스트 표시
+        if (_showRecentSearches)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(top: 10), // 검색창과 간격
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    '최근 검색어',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
-                    onPressed: _isSearchActive
-                        ? () {
-                            print('Searching for: ${_controller.text}');
-                          }
-                        : null,
-                    child: const Icon(
-                      Icons.search,
-                      color: Color(0xFF3669C9),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                ...recentSearches.map((search) => ListTile(
+                  title: Text(search),
+                  leading: Icon(Icons.history),
+                  onTap: () {
+                    // 검색어 클릭 시 동작
+                    print('Search for: $search');
+                    _controller.text = search;
+                    setState(() {
+                      _showRecentSearches = false; // 검색어를 클릭하면 리스트 닫기
+                    });
+                  },
+                )),
+              ],
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
+
+
 
 class BottomMenu extends StatefulWidget {
   @override
@@ -212,7 +299,7 @@ class CategorySection extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // 모두 보기 클릭 시 동작
+
                 },
                 child: Text(
                   '모두 보기',
@@ -310,7 +397,12 @@ class ProductCategorySection extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // 모두 보기 클릭 시 동작
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AllProductsPage(), // 모든 제품 페이지로 이동
+                    ),
+                  );
                 },
                 child: Text(
                   '모두 보기',
