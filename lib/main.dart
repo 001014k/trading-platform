@@ -16,7 +16,7 @@ class FigmaToCodeApp extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          elevation: 1, // 그림자 효과
+          elevation: 1,
           title: Text(
             'Trading Mall',
             style: TextStyle(
@@ -26,7 +26,7 @@ class FigmaToCodeApp extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          centerTitle: true, // 타이틀을 중앙에 위치시킴
+          centerTitle: true,
           actions: [
             IconButton(
               icon: Icon(Icons.notifications, color: Colors.black),
@@ -42,16 +42,17 @@ class FigmaToCodeApp extends StatelessWidget {
             ),
           ],
         ),
-        body: Column( // Column으로 변경
+        body: Column(
           children: [
-            // 앱바 바로 아래에 검색 상자 위치
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // 적절한 패딩 추가
-              child: SearchBar(), // 검색 상자 추가
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: SearchBar(),
             ),
+            const SizedBox(height: 16), // 검색 상자와 카테고리 섹션 사이의 간격
+            CategorySection(), // 카테고리 섹션 추가
             Expanded(
               child: Center(
-                child: Text('Main Content Area'), // 나머지 콘텐츠를 위한 영역
+                child: Text('Main Content Area'),
               ),
             ),
           ],
@@ -69,18 +70,18 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   final TextEditingController _controller = TextEditingController();
-  bool _isSearchActive = false; // 검색 활성화 상태
+  bool _isSearchActive = false;
 
   void _onSearchChanged(String value) {
     setState(() {
-      _isSearchActive = value.isNotEmpty; // 입력이 있을 경우 활성화
+      _isSearchActive = value.isNotEmpty;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity, // 전체 너비 사용
+      width: double.infinity,
       height: 50,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -106,7 +107,7 @@ class _SearchBarState extends State<SearchBar> {
                     child: TextField(
                       style: TextStyle(color: Colors.black),
                       controller: _controller,
-                      onChanged: _onSearchChanged, // 입력 변화에 따라 상태 업데이트
+                      onChanged: _onSearchChanged,
                       decoration: InputDecoration(
                         hintText: '제품을 검색하시오',
                         hintStyle: TextStyle(
@@ -115,23 +116,22 @@ class _SearchBarState extends State<SearchBar> {
                           fontFamily: 'DM Sans',
                           fontWeight: FontWeight.w500,
                         ),
-                        border: InputBorder.none, // 기본 테두리 제거
+                        border: InputBorder.none,
                       ),
                     ),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.zero, // 기본 패딩 제거
-                      elevation: 0, // 그림자 효과 제거
-                      backgroundColor: Colors.transparent, // 배경 투명
+                      padding: EdgeInsets.zero,
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
                     ),
                     onPressed: _isSearchActive ? () {
-                      // 검색 버튼 클릭 시 동작 추가
                       print('Searching for: ${_controller.text}');
-                    } : null, // 비활성화 상태에서는 클릭 이벤트 없음
+                    } : null,
                     child: const Icon(
                       Icons.search,
-                      color: Color(0xFF3669C9), // 아이콘 색상
+                      color: Color(0xFF3669C9),
                     ),
                   ),
                 ],
@@ -161,7 +161,7 @@ class _BottomMenuState extends State<BottomMenu> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed, // 4개 이상의 버튼을 균일하게 표시
+      type: BottomNavigationBarType.fixed,
       currentIndex: _selectedIndex,
       onTap: _onItemTapped,
       items: const <BottomNavigationBarItem>[
@@ -184,6 +184,100 @@ class _BottomMenuState extends State<BottomMenu> {
       ],
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
+    );
+  }
+}
+
+class CategorySection extends StatelessWidget {
+  const CategorySection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // 왼쪽 정렬
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 좌우로 공간을 두기
+            children: [
+              Text(
+                '카테고리',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // 모두 보기 클릭 시 동작
+                },
+                child: Text(
+                  '모두 보기',
+                  style: TextStyle(
+                    color: Color(0xFF3669C9),
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16), // 카테고리와 제목 사이의 간격
+          SizedBox(
+            height: 120, // 카테고리 슬라이드의 높이
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal, // 가로로 스크롤
+              child: Row(
+                children: [
+                  CategoryItem(title: '카테고리 1'),
+                  SizedBox(width: 16), // 카테고리 사이의 간격
+                  CategoryItem(title: '카테고리 2'),
+                  SizedBox(width: 16),
+                  CategoryItem(title: '카테고리 3'),
+                  SizedBox(width: 16),
+                  CategoryItem(title: '카테고리 4'),
+                  SizedBox(width: 16),
+                  CategoryItem(title: '카테고리 5'),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryItem extends StatelessWidget {
+  final String title;
+
+  const CategoryItem({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          color: Colors.blue,
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8), // 카테고리 제목과 상자 사이의 간격
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
