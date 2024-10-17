@@ -50,23 +50,20 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text.trim();
 
     try {
-      //firebaseauth를 이용해 로그인을 처리하는 기능
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      // Firebase Auth로 로그인 처리
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      if (userCredential.user != null) {
-        await _savePreferenced();
+      User? user = userCredential.user;
 
-        // 어드민 계정 로그인 확인
-        if (email == 'hm4854@gmail.com') {
-          Navigator.pushReplacementNamed(context, '/user_list');
-        } else {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+      if (user != null) {
+        // 로그인 성공 시 메인 페이지로 이동
+        Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
+      // 로그인 실패 시 에러 메시지 표시
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: ${e.toString()}')),
       );
@@ -77,6 +74,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, //뒤로가기 버튼을 없애는 코드
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(

@@ -1,20 +1,49 @@
 import 'package:flutter/material.dart';
 import 'all_products_page.dart';
+import 'login_page.dart';
+import 'SplashScreen_page.dart';
+import 'signup_page.dart';
+import 'ForgotPassword_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async{
   runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase 초기화
+  await Firebase.initializeApp();
+
+  runApp(const MyApp()); // 앱 실행
+
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      initialRoute: '/splash',
+      routes: {
+        '/splash': (context) => SplashScreen(),
+        '/login': (context) => LoginPage(),
+        '/signup': (context) => SignupPage(),
+        '/forgot_password': (context) => ForgotPasswordPage(),
+        '/home': (context) => HomePage(), // 메인 페이지
+      },
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47),
       ),
-      home: Scaffold(
+    );
+  }
+}
+
+// HomePage 클래스 추가
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+      return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 1,
@@ -58,7 +87,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: BottomMenu(),
-      ),
     );
   }
 }
