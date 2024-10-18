@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             SizedBox(height: 20,),
             Text(
-              'Traiding Mall',
+              'Trading Mall',
               style: TextStyle(
                 color: Color(0xFF3669C9),
                 fontSize: 18,
