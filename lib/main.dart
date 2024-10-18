@@ -347,15 +347,19 @@ class CategorySection extends StatelessWidget {
               scrollDirection: Axis.horizontal, // 가로로 스크롤
               child: Row(
                 children: [
-                  CategoryItem(title: '카테고리 1', icon: Icons.category),
+                  CategoryItem(title: '인기매물', icon: Icons.favorite),
                   SizedBox(width: 16), // 카테고리 사이의 간격
-                  CategoryItem(title: '카테고리 2', icon: Icons.category),
+                  CategoryItem(title: '디지털기기', icon: Icons.computer),
                   SizedBox(width: 16),
-                  CategoryItem(title: '카테고리 3', icon: Icons.category),
+                  CategoryItem(title: '가구/인테리어', icon: Icons.window),
                   SizedBox(width: 16),
-                  CategoryItem(title: '카테고리 4', icon: Icons.category),
+                  CategoryItem(title: '생활가전', icon: Icons.category),
                   SizedBox(width: 16),
-                  CategoryItem(title: '카테고리 5', icon: Icons.category),
+                  CategoryItem(title: '취미/게임/음반', icon: Icons.sports_esports),
+                  SizedBox(width: 16),
+                  CategoryItem(title: '도서', icon: Icons.book),
+                  SizedBox(width: 16),
+                  CategoryItem(title: '생활/주방', icon: Icons.category),
                 ],
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'main.dart'; // 게시물 페이지가 있는 파일을 import하세요.
+import 'postproduct_page.dart'; // 제품을 올리는 페이지를 import합니다.
 
 class AllProductsPage extends StatelessWidget {
   @override
@@ -16,6 +17,20 @@ class AllProductsPage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: Color(0xFF3669C9)), // 플러스 아이콘 추가
+            onPressed: () {
+              // 제품을 올리는 페이지로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostProductPage(), // 게시물 페이지로 이동
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
