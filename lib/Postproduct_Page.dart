@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart'; // Firebase Storage 패
 import 'package:image/image.dart' as img;
 import 'dart:typed_data';
 
+
 class PostProductPage extends StatefulWidget {
   @override
   _PostProductPageState createState() => _PostProductPageState();

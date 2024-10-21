@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'all_products_page.dart';
 import 'login_page.dart';
@@ -5,6 +7,8 @@ import 'SplashScreen_page.dart';
 import 'signup_page.dart';
 import 'ForgotPassword_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/intl.dart';
+import 'WishList_page.dart';
 
 void main() async{
   runApp(const MyApp());
@@ -269,9 +273,18 @@ class BottomMenu extends StatefulWidget {
 class _BottomMenuState extends State<BottomMenu> {
   int _selectedIndex = 0;
 
+  // Firebase Authentication에서 현재 사용자 ID 가져오기
+  String userId = FirebaseAuth.instance.currentUser?.uid ?? 'defaultUserId'; // 기본값은 임의로 설정
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) { // Wishlist 버튼이 눌렸을 때
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => WishlistPage(userId: userId,)),
+        );
+      }
     });
   }
 
@@ -347,7 +360,7 @@ class CategorySection extends StatelessWidget {
               scrollDirection: Axis.horizontal, // 가로로 스크롤
               child: Row(
                 children: [
-                  CategoryItem(title: '인기매물', icon: Icons.favorite),
+                  CategoryItem(title: '인기매물',icon: Icons.favorite),
                   SizedBox(width: 16), // 카테고리 사이의 간격
                   CategoryItem(title: '디지털기기', icon: Icons.computer),
                   SizedBox(width: 16),
@@ -451,18 +464,52 @@ class ProductCategorySection extends StatelessWidget {
           SizedBox(height: 10), // 제목과 카드 사이의 간격
 
           // 제품 카드 섹션
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal, // 가로로 스크롤
-            child: Row(
-              children: [
-                SkeletonProduct(), // 첫 번째 제품 카드
-                SkeletonProduct(), // 두 번째 제품 카드
-                SkeletonProduct(), // 세 번째 제품 카드
-                SkeletonProduct(), // 네 번째 제품 카드
-                SkeletonProduct(), // 다섯 번째 제품 카드
-                // 필요한 만큼 추가...
-              ],
-            ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('products')
+                .orderBy('createdAt', descending: true) // 제품 최신순으로 시각화
+                .limit(6) // 최대 6개 제품 카드만 표시
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(), // 로딩 인디케이터
+                );
+              }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(child: Text('등록된 제품이 없습니다.')); // 데이터가 없을 때 메시지 표시
+              }
+
+              final products = snapshot.data!.docs;
+
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal, // 가로로 스크롤
+                child: Row(
+                  children: products.map((productDoc) {
+                    var productData = productDoc.data() as Map<String, dynamic>;
+
+                    // Firestore에서 불러온 제품 정보
+                    String name = productData['name'] ?? '이름 없음';
+                    String description = productData['description'] ?? '설명 없음';
+                    String imageUrl = productData['imageUrl'] ?? ''; // 이미지 URL
+                    int price = productData['price'] ?? 0; // 제품 가격
+                    String keyword = productData['keyword'] ?? '키워드 없음';
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10.0), // 카드 간의 간격
+                      child: ProductCard(
+                        name: name,
+                        description: description,
+                        imageUrl: imageUrl,
+                        price: price,
+                        keyword: keyword,
+                      ), // 각 제품 카드 생성
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -470,9 +517,26 @@ class ProductCategorySection extends StatelessWidget {
   }
 }
 
-class SkeletonProduct extends StatelessWidget {
+class ProductCard extends StatelessWidget {
+  final String name;
+  final String description;
+  final String imageUrl;
+  final int price;
+  final String keyword;
+
+  const ProductCard({
+    Key? key,
+    required this.name,
+    required this.description,
+    required this.imageUrl,
+    required this.price,
+    required this.keyword,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    String formattedPrice = NumberFormat('#,##0').format(price);
+
     return Padding(
       padding: const EdgeInsets.only(right: 10.0), // 카드 간의 간격
       child: Column(
@@ -483,7 +547,7 @@ class SkeletonProduct extends StatelessWidget {
             width: 156,
             height: 242,
             decoration: BoxDecoration(
-              color: Color(0xFFFAFAFA),
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -497,7 +561,7 @@ class SkeletonProduct extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start, // 왼쪽 정렬
               children: [
-                // 사진을 보여주는 컨테이너
+                // 제품 이미지를 보여주는 컨테이너
                 Container(
                   width: 156, // 전체 너비
                   height: 130, // 사진 높이
@@ -505,11 +569,9 @@ class SkeletonProduct extends StatelessWidget {
                     color: Color(0xFFEDEDED), // 사진 배경색
                     borderRadius: BorderRadius.vertical(
                         top: Radius.circular(10)), // 위쪽 모서리 둥글게
-                  ),
-                  child: Center(
-                    child: Text(
-                      '사진', // 사진 대신 보여줄 텍스트
-                      style: TextStyle(color: Colors.grey),
+                    image: DecorationImage(
+                      image: NetworkImage(imageUrl), // 제품 이미지 URL로부터 이미지를 가져옴
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -519,10 +581,11 @@ class SkeletonProduct extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 여백
                   child: Text(
-                    '제품 이름', // 제품 이름
+                    name, // 제품 이름
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black
                     ),
                   ),
                 ),
@@ -532,10 +595,24 @@ class SkeletonProduct extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 여백
                   child: Text(
-                    '제품 설명이 여기에 들어갑니다.', // 제품 설명
+                    description, // 제품 설명
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 4), // 가격 표시 간격
+
+                // 제품 가격
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 여백
+                  child: Text(
+                    '₩$formattedPrice', // 포맷팅된 가격 사용
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
                     ),
                   ),
                 ),
