@@ -45,8 +45,8 @@ class _SignupPageState extends State<SignupPage> {
           'createdAt': Timestamp.now(),
         });
 
-        final userMarkersCollection = userDocRef.collection('user_markers');
-        await userMarkersCollection.doc('init').set({
+        final productListCollection = userDocRef.collection('product_list');
+        await productListCollection.doc('init').set({
           'initialized': true,
         });
 
