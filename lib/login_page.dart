@@ -51,16 +51,16 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // Firebase Auth로 로그인 처리
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       User? user = userCredential.user;
 
-      if (user != null) {
-        // 로그인 성공 시 메인 페이지로 이동
-        Navigator.pushReplacementNamed(context, '/home');
+      if (userCredential.user != null) {
+        await _savePreferenced();
+          Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
       // 로그인 실패 시 에러 메시지 표시
