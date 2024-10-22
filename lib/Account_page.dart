@@ -13,7 +13,18 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('계정 페이지'),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text(
+          'Account',
+          style: TextStyle(
+            color: Color(0xFF3669C9),
+            fontSize: 18,
+            fontFamily: 'DM Sans',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: FutureBuilder<int>(
         future: _getItemCount(userId),
@@ -28,24 +39,68 @@ class AccountPage extends StatelessWidget {
 
           final itemCount = snapshot.data ?? 0;
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '게시물 수: $itemCount개',
-                style: TextStyle(fontSize: 24),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  // 로그아웃 기능 구현
-                  await FirebaseAuth.instance.signOut();
-                  // 로그아웃 후 홈 페이지로 이동
-                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                },
-                child: Text('로그아웃'),
-              ),
-            ],
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 게시물 수를 표시하는 카드
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '게시물 수',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF3669C9),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          '$itemCount개',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+                // 로그아웃 버튼
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF3669C9), // 버튼 배경색
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 패딩
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // 둥근 모서리
+                    ),
+                  ),
+                  onPressed: () async {
+                    // 로그아웃 기능 구현
+                    await FirebaseAuth.instance.signOut();
+                    // 로그아웃 후 홈 페이지로 이동
+                    Navigator.pushNamedAndRemoveUntil(context, '/splash', (route) => false);
+                  },
+                  child: Text(
+                    '로그아웃',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white, // 텍스트 색상
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -56,9 +111,8 @@ class AccountPage extends StatelessWidget {
   // Firestore에서 사용자가 올린 물품의 개수를 가져오는 함수
   Future<int> _getItemCount(String userId) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users') // 사용자 컬렉션
-        .doc(userId) // 현재 사용자 문서
-        .collection('items') // 물품 서브컬렉션
+        .collection('products') // 'products' 컬렉션으로 변경
+        .where('userId', isEqualTo: userId) // userId 필드로 필터링
         .get();
 
     return querySnapshot.docs.length; // 물품 개수 반환
@@ -122,4 +176,3 @@ class _BottomMenuState extends State<BottomMenu> {
     );
   }
 }
-
