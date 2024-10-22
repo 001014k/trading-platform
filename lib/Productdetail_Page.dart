@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore 패키지 추가
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  final String userId; // 로그인한 사용자 ID
-  final String id; // 고유 ID
+  final String userId;
+  final String id;
   final String name;
   final String description;
   final String imageUrl;
@@ -27,46 +27,89 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스
-  bool isInWishlist = false; // 위시리스트 상태 변수
-  int viewCount = 0; // 조회수 변수
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool isInWishlist = false;
+  int viewCount = 0;
+  String? userEmail;
+  String? currentUserId; //현재 로그인한 사용자의 id
 
   @override
   void initState() {
     super.initState();
-    checkWishlistStatus(); // 위시리스트 상태 체크
-    incrementViewCount(); // 페이지가 로드될 때 조회수 증가
+    fetchCurrentUser(); // 로그인한 사용자 ID 가져오기
+    checkWishlistStatus();
+    fetchAndIncrementViewCount(); // 조회수 증가 및 가져오기
+    fetchUserEmail();
   }
 
-  // 위시리스트 상태 체크 함수
+  // Firebase Authentication에서 현재 로그인한 사용자 ID 가져오기
+  Future<void> fetchCurrentUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUserId = user.uid; // 로그인한 사용자 ID 저장
+      });
+    }
+  }
+
+  Future<void> fetchUserEmail() async {
+    // 1. products 컬렉션에서 제품 고유 번호로 해당 제품 문서를 가져옴
+    final productSnapshot = await _firestore.collection('products').doc(widget.id).get();
+
+    if (productSnapshot.exists) {
+      // 2. 해당 제품 문서에서 userId 필드를 가져옴
+      String userId = productSnapshot.data()?['userId'];
+
+      // 3. 가져온 userId를 사용하여 users 컬렉션에서 판매자의 이메일을 조회
+      final userSnapshot = await _firestore.collection('users').doc(userId).get();
+      if (userSnapshot.exists) {
+        setState(() {
+          userEmail = userSnapshot.data()?['email']; // 판매자의 이메일을 저장
+        });
+      }
+    }
+  }
+
   Future<void> checkWishlistStatus() async {
     final wishlistSnapshot = await _firestore
         .collection('users')
-        .doc(widget.userId) // 사용자 ID로 문서 참조
+        .doc(currentUserId)
         .collection('wishlists')
         .doc(widget.id)
         .get();
 
     setState(() {
-      isInWishlist = wishlistSnapshot.exists; // 문서가 존재하면 위시리스트에 추가된 상태
+      isInWishlist = wishlistSnapshot.exists;
     });
   }
 
-  // 조회수 증가 함수
-  void incrementViewCount() {
-    setState(() {
-      viewCount++; // 조회수를 1 증가
-    });
+  // Firestore에서 조회수 가져오기 및 업데이트하는 함수
+  Future<void> fetchAndIncrementViewCount() async {
+    final productRef = _firestore.collection('products').doc(widget.id);
+    final productSnapshot = await productRef.get();
+
+    if (productSnapshot.exists) {
+      viewCount = productSnapshot.data()?['viewCount'] ?? 0;
+      viewCount++;
+      await productRef.update({'viewCount': viewCount});
+      setState(() {}); // UI 업데이트
+    }
   }
 
-  // 위시리스트 추가/삭제 함수
   Future<void> toggleWishlist() async {
-    final userWishlistRef = _firestore.collection('users').doc(widget.userId).collection('wishlists').doc(widget.id);
+    // 로그인한 사용자의 userId를 가져옴 (currentUserId 사용)
+    final userWishlistRef = _firestore
+        .collection('users')
+        .doc(currentUserId) // widget.userId 대신 currentUserId 사용
+        .collection('wishlists')
+        .doc(widget.id);
 
     if (isInWishlist) {
-      // 위시리스트에서 제거
+      // 위시리스트에서 삭제
       await userWishlistRef.delete();
-      isInWishlist = false;
+      setState(() {
+        isInWishlist = false;
+      });
     } else {
       // 위시리스트에 추가
       await userWishlistRef.set({
@@ -78,15 +121,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         'keyword': widget.keyword,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      isInWishlist = true;
+      setState(() {
+        isInWishlist = true;
+      });
     }
-
-    setState(() {}); // 상태 업데이트
   }
+
 
   @override
   Widget build(BuildContext context) {
-    // 가격 포맷팅
     String formattedPrice = NumberFormat('#,##0').format(widget.price);
 
     return Scaffold(
@@ -119,7 +162,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 제품 이미지
             widget.imageUrl.isNotEmpty
                 ? Image.network(widget.imageUrl, fit: BoxFit.cover)
                 : Container(
@@ -128,72 +170,42 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Icon(Icons.image_not_supported, size: 100),
             ),
             SizedBox(height: 16),
-
-            // 제품 이름
-            Text(
-              widget.name,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            Text(widget.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             Divider(thickness: 1, color: Colors.grey[300]),
             SizedBox(height: 8),
-
-            // 제품 설명
-            Text(
-              widget.description,
-              style: TextStyle(fontSize: 16),
-            ),
+            Text(widget.description, style: TextStyle(fontSize: 16)),
             Divider(thickness: 1, color: Colors.grey[300]),
             SizedBox(height: 8),
-
-            // 키워드
             Row(
               children: [
-                Text(
-                  '키워드:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                Text('키워드:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 SizedBox(width: 8),
-                Text(
-                  widget.keyword,
-                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                ),
+                Text(widget.keyword, style: TextStyle(fontSize: 16, color: Colors.grey[700])),
               ],
             ),
             Divider(thickness: 1, color: Colors.grey[300]),
             SizedBox(height: 8),
-
-            // 가격
             Row(
               children: [
-                Text(
-                  '₩$formattedPrice',
-                  style: TextStyle(fontSize: 20, color: Colors.blueAccent),
-                ),
+                Text('₩$formattedPrice', style: TextStyle(fontSize: 20, color: Colors.blueAccent)),
               ],
             ),
             SizedBox(height: 16),
-
-            // 위시리스트 및 조회 카운트 섹션
+            if (userEmail != null) ...[
+              Text('판매자 이메일: $userEmail', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
+              SizedBox(height: 8),
+            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      isInWishlist ? Icons.favorite : Icons.favorite_border,
-                      color: isInWishlist ? Colors.red : Colors.grey,
-                    ),
+                    Icon(isInWishlist ? Icons.favorite : Icons.favorite_border, color: isInWishlist ? Colors.red : Colors.grey),
                     SizedBox(width: 8),
-                    Text(
-                      isInWishlist ? '위시리스트에 추가됨' : '위시리스트에 추가',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    Text(isInWishlist ? '위시리스트에 추가됨' : '위시리스트에 추가', style: TextStyle(fontSize: 16)),
                   ],
                 ),
-                Text(
-                  '조회수: $viewCount',
-                  style: TextStyle(fontSize: 16),
-                ),
+                Text('조회수: $viewCount', style: TextStyle(fontSize: 16)),
               ],
             ),
           ],
