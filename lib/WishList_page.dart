@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trading_platform_app/Account_page.dart';
+import 'package:trading_platform_app/all_products_page.dart';
+import 'package:trading_platform_app/main.dart';
 
 // Wishlist 페이지
 class WishlistPage extends StatelessWidget {
@@ -19,7 +22,7 @@ class WishlistPage extends StatelessWidget {
         elevation: 1,
         title: Center(
           child: Text(
-            '위시리스트',
+            'WishList',
             style: TextStyle(
               color: Color(0xFF3669C9),
               fontSize: 18,
@@ -91,19 +94,16 @@ class _BottomMenuState extends State<BottomMenu> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-
-      // 각 아이템을 눌렀을 때의 동작 설정
-      if (index == 0) {
-        // 홈 페이지로 이동
-        Navigator.pushNamed(context, '/home');
-      } else if (index == 1) {
-        // 현재 페이지는 Wishlist이므로 아무 동작도 하지 않음
-      } else if (index == 2) {
-        // 주문 페이지로 이동
-        Navigator.pushNamed(context, '/order');
+      if (index == 0) { // Wishlist 버튼이 눌렸을 때
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
       } else if (index == 3) {
-        // 계정 페이지로 이동
-        Navigator.pushNamed(context, '/account');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountPage(userId: currentUserId,)),
+        );
       }
     });
   }
