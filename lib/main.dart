@@ -9,6 +9,7 @@ import 'ForgotPassword_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'WishList_page.dart';
+import 'Account_page.dart';
 
 void main() async{
   runApp(const MyApp());
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
         '/forgot_password': (context) => ForgotPasswordPage(),
-        '/home': (context) => HomePage(), // 메인 페이지
+        '/home': (context) => HomePage(),
       },
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47),
@@ -283,6 +284,11 @@ class _BottomMenuState extends State<BottomMenu> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => WishlistPage(userId: userId,)),
+        );
+      } else if (index == 3) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountPage(userId: userId)),
         );
       }
     });

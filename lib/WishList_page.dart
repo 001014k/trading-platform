@@ -4,29 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomePage(),
-      routes: {
-        '/home': (context) => HomePage(),
-        '/order': (context) => OrderPage(),
-        '/account': (context) => AccountPage(),
-      },
-    );
-  }
-}
-
-
 // Wishlist 페이지
 class WishlistPage extends StatelessWidget {
   final String userId; // 현재 사용자 ID
@@ -157,71 +134,6 @@ class _BottomMenuState extends State<BottomMenu> {
       ],
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
-    );
-  }
-}
-
-// 홈 페이지
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('홈 페이지'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            // 샘플 제품 데이터
-            final item = {
-              'name': '제품 1',
-              'description': '이것은 제품 1입니다.',
-              'imageUrl': 'https://via.placeholder.com/150',
-              'price': 20000,
-            };
-
-            // 위시리스트에 추가
-            final prefs = await SharedPreferences.getInstance();
-            List<String>? wishlistJson = prefs.getStringList('wishlist') ?? [];
-            wishlistJson.add(jsonEncode(item)); // Map을 JSON 문자열로 변환하여 추가
-            await prefs.setStringList('wishlist', wishlistJson);
-
-            // 위시리스트 페이지로 이동
-            Navigator.pushNamed(context, '/wishlist', arguments: item);
-          },
-          child: Text('위시리스트에 제품 추가'),
-        ),
-      ),
-    );
-  }
-}
-
-// 주문 페이지
-class OrderPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('주문 페이지'),
-      ),
-      body: Center(
-        child: Text('여기는 주문 페이지입니다.'),
-      ),
-    );
-  }
-}
-
-// 계정 페이지
-class AccountPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('계정 페이지'),
-      ),
-      body: Center(
-        child: Text('여기는 계정 페이지입니다.'),
-      ),
     );
   }
 }
