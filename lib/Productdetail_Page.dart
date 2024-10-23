@@ -70,7 +70,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Future<void> fetchUserEmail() async {
     // 1. products 컬렉션에서 제품 고유 번호로 해당 제품 문서를 가져옴
     final productSnapshot =
-        await _firestore.collection('products').doc(widget.id).get();
+    await _firestore.collection('products').doc(widget.id).get();
 
     if (productSnapshot.exists) {
       // 2. 해당 제품 문서에서 userId 필드를 가져옴
@@ -78,7 +78,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
       // 3. 가져온 userId를 사용하여 users 컬렉션에서 판매자의 이메일을 조회
       final userSnapshot =
-          await _firestore.collection('users').doc(userId).get();
+      await _firestore.collection('users').doc(userId).get();
       if (userSnapshot.exists) {
         setState(() {
           userEmail = userSnapshot.data()?['email']; // 판매자의 이메일을 저장
@@ -175,7 +175,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('입찰 금액 입력'),
+          title: Text('입찰 금액', style: TextStyle(fontWeight: FontWeight.bold),),
           content: TextField(
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
@@ -187,18 +187,38 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             },
           ),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () {
                 submitUserPrice(userPriceInput); // 입력된 금액 제출
                 Navigator.of(context).pop(); // 대화 상자 닫기
               },
-              child: Text('제출'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // 배경색 설정
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 패딩 설정
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                ),
+              ),
+              child: Text(
+                '제출',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(); // 대화 상자 닫기
               },
-              child: Text('취소'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // 배경색 설정
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 패딩 설정
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                ),
+              ),
+              child: Text('취소',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
             ),
           ],
         );
@@ -248,7 +268,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           .add({
         'productId': widget.id,
         'productName': widget.name,
-        'productPrice': double.tryParse(offerPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0.0, // 가격에서 ₩ 제거
+        'productPrice': double.tryParse(
+            offerPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0.0, // 가격에서 ₩ 제거
         'createdAt': FieldValue.serverTimestamp(),
       });
     }
@@ -285,7 +306,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ],
       ),
       body: SingleChildScrollView(
-        // SingleChildScrollView로 감싸기
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,10 +313,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             widget.imageUrl.isNotEmpty
                 ? Image.network(widget.imageUrl, fit: BoxFit.cover)
                 : Container(
-                    height: 200,
-                    color: Colors.grey[200],
-                    child: Icon(Icons.image_not_supported, size: 100),
-                  ),
+              height: 200,
+              color: Colors.grey[200],
+              child: Icon(Icons.image_not_supported, size: 100),
+            ),
             SizedBox(height: 16),
             Text(widget.name,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
@@ -308,8 +328,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Row(
               children: [
                 Text('키워드:',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 SizedBox(width: 8),
                 Text(widget.keyword,
                     style: TextStyle(fontSize: 16, color: Colors.grey[700])),
@@ -344,75 +364,125 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Text('조회수: $viewCount', style: TextStyle(fontSize: 16)),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
-              children: [
-                ElevatedButton(
-                  onPressed: _showBidDialog,
-                  child: Text('입찰 금액 입력'),
-                ),
-              ],
+            SizedBox(height: 16),
+
+            // 입찰하기 섹션
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+              ),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      '입찰하기',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _showBidDialog,
+                        child: Text(
+                            '입찰 금액 입력',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: 16),
 
-            SizedBox(height: 16),
-            // 사용자의 입찰 내역 표시
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection('products')
-                  .doc(widget.id)
-                  .collection('offers')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-
-                return Column(
-                  children: snapshot.data!.docs.map((offer) {
-                    final offerData =
-                        offer.data() as Map<String, dynamic>?; // 안전하게 타입 변환
-                    final offerUserEmail =
-                        offerData?['userEmail'] ?? '알 수 없는 사용자'; // 이메일 출력
-                    final offerPrice = offerData?['price'] != null
-                        ? '₩${NumberFormat('#,##0').format(offerData!['price'])}' // 금액 포맷팅
-                        : '금액 없음'; // null 체크
-                    final bidderUserId = offerData?['userId']; // 입찰한 사용자 ID 가져오기
-
-                    return GestureDetector(
-                      // GestureDetector로 감싸기
-                      onTap: () {
-                        // 제품을 올린 사용자와 현재 사용자가 같은 경우에만 다이얼로그 띄우기
-                        if (currentUserId == productOwnerId) {
-                          _showConfirmBidDialog(offerPrice, bidderUserId);
-                        } else {
-                          // 제품을 올린 사용자가 아닐 경우 사용자에게 알림
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('입찰 확정 권한이 없습니다.')),
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        margin: EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(offerUserEmail,
-                                style: TextStyle(fontSize: 16)),
-                            // 이메일 표시
-                            Text(offerPrice, style: TextStyle(fontSize: 16)),
-                          ],
-                        ),
+            // 입찰 내역 섹션
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+              ),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(
+                      '입찰 내역',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
                       ),
-                    );
-                  }).toList(),
-                );
-              },
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: _firestore
+                        .collection('products')
+                        .doc(widget.id)
+                        .collection('offers')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return CircularProgressIndicator();
+                      }
+
+                      return Column(
+                        children: snapshot.data!.docs.map((offer) {
+                          final offerData =
+                          offer.data() as Map<String, dynamic>?;
+                          final offerUserEmail =
+                              offerData?['userEmail'] ?? '알 수 없는 사용자';
+                          final offerPrice = offerData?['price'] != null
+                              ? '₩${NumberFormat('#,##0').format(
+                              offerData!['price'])}'
+                              : '금액 없음';
+                          final bidderUserId = offerData?['userId'];
+
+                          return GestureDetector(
+                            onTap: () {
+                              if (currentUserId == productOwnerId) {
+                                _showConfirmBidDialog(offerPrice, bidderUserId);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('입찰 확정 권한이 없습니다.')),
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              margin: EdgeInsets.symmetric(vertical: 4),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceBetween,
+                                children: [
+                                  Text(offerUserEmail,
+                                      style: TextStyle(fontSize: 16, color: Colors.black)),
+                                  Text(offerPrice,
+                                      style: TextStyle(fontSize: 16, color: Colors.black)),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
