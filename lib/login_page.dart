@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
             CircleAvatar(
               radius: 100,
               backgroundColor: Colors.black,
-              backgroundImage: AssetImage('assets/kmj.png'),
+              backgroundImage: AssetImage('assets/tana13ypatttkymflhse.png'),
             ),
             SizedBox(height: 20),
             TextField(
