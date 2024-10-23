@@ -55,56 +55,80 @@ class CartPage extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
-              return ListTile(
-                title: Text(item['productName']),
-                subtitle: Text('가격: ₩${item['productPrice'].toString()}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // 삭제 버튼 클릭 시
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('삭제 확인',style: TextStyle(fontWeight: FontWeight.bold),),
-                          content: Text('이 항목을 삭제하시겠습니까?'),
-                          actions: [
-                            TextButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                // 배경색 설정
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                // 패딩 설정
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+              return Container(
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // 간격 조절
+                padding: EdgeInsets.all(16.0), // 내부 여백
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2), // 그림자 색상
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: Offset(0, 3), // 위치 조절
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  title: Text(
+                    item['productName'],
+                    style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),
+                  ),
+                  subtitle: Text('가격: ₩${item['productPrice'].toString()}',style: TextStyle(color: Colors.black),),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      // 삭제 버튼 클릭 시
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(
+                              '삭제 확인',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            content: Text('이 항목을 삭제하시겠습니까?'),
+                            actions: [
+                              TextButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                  ),
+                                ),
+                                onPressed: () {
+                                  deleteItem(item.id); // 항목 삭제
+                                  Navigator.of(context).pop(); // 대화 상자 닫기
+                                },
+                                child: Text(
+                                  '삭제',
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
-                              onPressed: () {
-                                deleteItem(item.id); // 항목 삭제
-                                Navigator.of(context).pop(); // 대화 상자 닫기
-                              },
-                              child: Text('삭제',style: TextStyle(color: Colors.black),),
-                            ),
-                            TextButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                // 배경색 설정
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                // 패딩 설정
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                              TextButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 대화 상자 닫기
+                                },
+                                child: Text(
+                                  '취소',
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
-                              onPressed: () {
-                                Navigator.of(context).pop(); // 대화 상자 닫기
-                              },
-                              child: Text('취소',style: TextStyle(color: Colors.black),),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               );
             },
