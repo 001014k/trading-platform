@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _rememberMe = prefs.getBool('remember_me') ?? false;
-      if(_rememberMe) {
+      if (_rememberMe) {
         _emailController.text = prefs.getString('email') ?? '';
         _passwordController.text = prefs.getString('password') ?? '';
       }
@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _savePreferenced() async {
     final prefs = await SharedPreferences.getInstance();
-    if(_rememberMe) {
+    if (_rememberMe) {
       prefs.setBool('remember_me', true);
       prefs.setString('email', _emailController.text);
       prefs.setString('password', _passwordController.text);
@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (userCredential.user != null) {
         await _savePreferenced();
-          Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
       // 로그인 실패 시 에러 메시지 표시
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(
-            'Trading Mall',
+          'Trading Mall',
           style: TextStyle(
             color: Colors.blue,
             fontSize: 18,
@@ -104,7 +104,10 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 labelText: '이메일',
                 hintText: '이메일을 입력하세요',
-                prefixIcon: Icon(Icons.email_outlined,color: Colors.white,),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: Colors.white,
+                ),
                 border: OutlineInputBorder(),
                 labelStyle: TextStyle(color: Colors.white),
               ),
@@ -117,12 +120,16 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 labelText: '비밀번호',
                 hintText: '비밀번호를 입력하세요',
-                prefixIcon: const Icon(Icons.lock_outline_rounded,color: Colors.white,),
+                prefixIcon: const Icon(
+                  Icons.lock_outline_rounded,
+                  color: Colors.white,
+                ),
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordVisible
-                      ? Icons.visibility_off
-                      : Icons.visibility,
+                  icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.white),
                   onPressed: () {
                     setState(() {
@@ -160,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 onPressed: () => _login(context),
                 child: Text(
-                    '로그인',
+                  '로그인',
                   style: TextStyle(
                     fontFamily: 'DM Sans',
                     fontWeight: FontWeight.w700,
@@ -179,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pushNamed(context, '/signup');
                 },
                 child: Text(
-                    '회원가입',
+                  '회원가입',
                   style: TextStyle(
                     fontFamily: 'DM Sans',
                     fontWeight: FontWeight.w700,
@@ -198,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.pushNamed(context, '/forgot_password');
                 },
                 child: Text(
-                    '비밀번호 찾기',
+                  '비밀번호 찾기',
                   style: TextStyle(
                     fontFamily: 'DM Sans',
                     fontWeight: FontWeight.w700,

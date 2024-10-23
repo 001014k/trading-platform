@@ -78,7 +78,10 @@ class HomePage extends StatelessWidget {
               // 장바구니 버튼 클릭 시 카트 페이지로 이동
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CartPage(userId: userId,)), // CartPage는 카트 페이지의 이름
+                MaterialPageRoute(
+                    builder: (context) => CartPage(
+                          userId: userId,
+                        )), // CartPage는 카트 페이지의 이름
               );
             },
           ),
@@ -397,8 +400,8 @@ class CategorySection extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductListPage(keyword: '디지털기기')),
+                                          builder: (context) => ProductListPage(
+                                              keyword: '디지털기기')),
                                     );
                                   },
                                 ),
@@ -409,8 +412,8 @@ class CategorySection extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductListPage(keyword: '가구/인테리어')),
+                                          builder: (context) => ProductListPage(
+                                              keyword: '가구/인테리어')),
                                     );
                                   },
                                 ),
@@ -433,8 +436,8 @@ class CategorySection extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductListPage(keyword: '취미/게임/음반')),
+                                          builder: (context) => ProductListPage(
+                                              keyword: '취미/게임/음반')),
                                     );
                                   },
                                 ),
@@ -457,8 +460,8 @@ class CategorySection extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductListPage(keyword: '생활/주방')),
+                                          builder: (context) => ProductListPage(
+                                              keyword: '생활/주방')),
                                     );
                                   },
                                 ),
@@ -580,7 +583,6 @@ class CategorySection extends StatelessWidget {
   }
 }
 
-
 class ProductListPage extends StatelessWidget {
   final String keyword;
 
@@ -621,12 +623,15 @@ class ProductListPage extends StatelessWidget {
 
             final products = snapshot.data!.docs;
 
-            return SingleChildScrollView( // SingleChildScrollView로 감싸기
+            return SingleChildScrollView(
+              // SingleChildScrollView로 감싸기
               child: Column(
                 children: [
                   GridView.builder(
-                    shrinkWrap: true, // 그리드 뷰 크기를 조절
-                    physics: NeverScrollableScrollPhysics(), // 그리드 뷰 내 스크롤 비활성화
+                    shrinkWrap: true,
+                    // 그리드 뷰 크기를 조절
+                    physics: NeverScrollableScrollPhysics(),
+                    // 그리드 뷰 내 스크롤 비활성화
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2, // 한 줄에 두 개의 카드
                       crossAxisSpacing: 16.0, // 카드 사이의 간격
@@ -636,7 +641,7 @@ class ProductListPage extends StatelessWidget {
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       final product =
-                      products[index].data() as Map<String, dynamic>;
+                          products[index].data() as Map<String, dynamic>;
                       final name = product['name'] ?? '';
                       final description = product['description'] ?? '';
                       final imageUrl = product['imageUrl'] ?? '';
@@ -660,7 +665,6 @@ class ProductListPage extends StatelessWidget {
     );
   }
 }
-
 
 class CategoryItem extends StatelessWidget {
   final String title;

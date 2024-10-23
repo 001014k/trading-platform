@@ -22,7 +22,9 @@ class ForgotPasswordPage extends StatelessWidget {
       Navigator.pop(context); // 이메일 전송 후 로그인 페이지로 돌아가기
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send password reset email: ${e.toString()}')),
+        SnackBar(
+            content:
+                Text('Failed to send password reset email: ${e.toString()}')),
       );
     }
   }
@@ -54,7 +56,10 @@ class ForgotPasswordPage extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: '이메일',
                 hintText: '이메일을 입력하세요',
-                prefixIcon: Icon(Icons.email_outlined,color: Colors.white,),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: Colors.white,
+                ),
                 border: OutlineInputBorder(),
                 labelStyle: TextStyle(color: Colors.white),
               ),

@@ -66,21 +66,39 @@ class CartPage extends StatelessWidget {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text('삭제 확인'),
+                          title: Text('삭제 확인',style: TextStyle(fontWeight: FontWeight.bold),),
                           content: Text('이 항목을 삭제하시겠습니까?'),
                           actions: [
                             TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // 대화 상자 닫기
-                              },
-                              child: Text('취소'),
-                            ),
-                            TextButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                // 배경색 설정
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                // 패딩 설정
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                ),
+                              ),
                               onPressed: () {
                                 deleteItem(item.id); // 항목 삭제
                                 Navigator.of(context).pop(); // 대화 상자 닫기
                               },
-                              child: Text('삭제'),
+                              child: Text('삭제',style: TextStyle(color: Colors.black),),
+                            ),
+                            TextButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                // 배경색 설정
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                // 패딩 설정
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // 대화 상자 닫기
+                              },
+                              child: Text('취소',style: TextStyle(color: Colors.black),),
                             ),
                           ],
                         );
