@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'WishList_page.dart';
 import 'Account_page.dart';
+import 'Cart_page.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -48,6 +49,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -73,7 +75,11 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.shopping_cart, color: Colors.black),
             onPressed: () {
-              // 장바구니 버튼 클릭 시 동작
+              // 장바구니 버튼 클릭 시 카트 페이지로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CartPage(userId: userId,)), // CartPage는 카트 페이지의 이름
+              );
             },
           ),
         ],

@@ -15,12 +15,12 @@ class AccountPage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        elevation: 1,
+        elevation: 2,
         title: Text(
           'Account',
           style: TextStyle(
             color: Color(0xFF3669C9),
-            fontSize: 18,
+            fontSize: 20,
             fontFamily: 'DM Sans',
             fontWeight: FontWeight.w700,
           ),
@@ -39,67 +39,72 @@ class AccountPage extends StatelessWidget {
 
           final itemCount = snapshot.data ?? 0;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 게시물 수를 표시하는 카드
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '게시물 수',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF3669C9),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          '$itemCount개',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 40),
-                // 로그아웃 버튼
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF3669C9), // 버튼 배경색
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 패딩
+          return Center( // Center 위젯 추가하여 중앙 정렬
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center, // 가로 정렬도 중앙으로
+                children: [
+                  // 게시물 수를 표시하는 카드
+                  Card(
+                    elevation: 4,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // 둥근 모서리
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '게시물 수',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF3669C9),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            '$itemCount개',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  onPressed: () async {
-                    // 로그아웃 기능 구현
-                    await FirebaseAuth.instance.signOut();
-                    // 로그아웃 후 홈 페이지로 이동
-                    Navigator.pushNamedAndRemoveUntil(context, '/splash', (route) => false);
-                  },
-                  child: Text(
-                    '로그아웃',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white, // 텍스트 색상
+                  SizedBox(height: 40),
+                  // 로그아웃 버튼
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF3669C9), // 버튼 배경색
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 28), // 패딩
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30), // 둥근 모서리
+                      ),
+                      elevation: 4, // 그림자 추가
+                    ),
+                    onPressed: () async {
+                      // 로그아웃 기능 구현
+                      await FirebaseAuth.instance.signOut();
+                      // 로그아웃 후 홈 페이지로 이동
+                      Navigator.pushNamedAndRemoveUntil(context, '/splash', (route) => false);
+                    },
+                    child: Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white, // 텍스트 색상
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

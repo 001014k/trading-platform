@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'Cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String userId;
@@ -31,6 +32,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool isInWishlist = false;
   int viewCount = 0;
   String? userEmail;
+  String? productOwnerId; // 제품을 올린 사용자 ID 저장
   String? currentUserId; // 현재 로그인한 사용자의 ID
 
   @override
@@ -39,8 +41,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     fetchCurrentUser(); // 로그인한 사용자 ID 가져오기
     checkWishlistStatus();
     fetchAndIncrementViewCount(); // 조회수 증가 및 가져오기
-    fetchUserEmail();
+    fetchUserEmail(); // 판매자의 이메일 가져오기
+    fetchProductOwnerId(); // 제품을 올린 사용자 ID 가져오기
   }
+
+  Future<void> fetchProductOwnerId() async {
+    final productSnapshot =
+    await _firestore.collection('products').doc(widget.id).get();
+
+    if (productSnapshot.exists) {
+      setState(() {
+        productOwnerId = productSnapshot.data()?['userId']; // 제품을 올린 사용자 ID 저장
+      });
+    }
+  }
+
 
   // Firebase Authentication에서 현재 로그인한 사용자 ID 가져오기
   Future<void> fetchCurrentUser() async {
@@ -191,6 +206,55 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
+  void _showConfirmBidDialog(String offerPrice, String bidderUserId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('입찰 확정'),
+          content: Text('입찰 금액: $offerPrice\n\n이 입찰을 확정하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 대화 상자 닫기
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                addToCart(offerPrice, bidderUserId); // 장바구니에 추가
+                Navigator.of(context).pop(); // 대화 상자 닫기
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartPage(userId: bidderUserId),
+                  ), // 장바구니 페이지로 이동
+                );
+              },
+              child: Text('확정'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> addToCart(String offerPrice, String bidderUserId) async {
+    if (bidderUserId != null) { // 입찰한 사용자 ID가 null이 아닐 경우
+      await _firestore
+          .collection('users')
+          .doc(bidderUserId) // 입찰한 사용자의 ID로 장바구니에 추가
+          .collection('cart')
+          .add({
+        'productId': widget.id,
+        'productName': widget.name,
+        'productPrice': double.tryParse(offerPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0.0, // 가격에서 ₩ 제거
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     String formattedPrice = NumberFormat('#,##0').format(widget.price);
@@ -313,21 +377,37 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     final offerPrice = offerData?['price'] != null
                         ? '₩${NumberFormat('#,##0').format(offerData!['price'])}' // 금액 포맷팅
                         : '금액 없음'; // null 체크
+                    final bidderUserId = offerData?['userId']; // 입찰한 사용자 ID 가져오기
 
-                    return Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.symmetric(vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(offerUserEmail, style: TextStyle(fontSize: 16)),
-                          // 이메일 표시
-                          Text(offerPrice, style: TextStyle(fontSize: 16)),
-                        ],
+                    return GestureDetector(
+                      // GestureDetector로 감싸기
+                      onTap: () {
+                        // 제품을 올린 사용자와 현재 사용자가 같은 경우에만 다이얼로그 띄우기
+                        if (currentUserId == productOwnerId) {
+                          _showConfirmBidDialog(offerPrice, bidderUserId);
+                        } else {
+                          // 제품을 올린 사용자가 아닐 경우 사용자에게 알림
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('입찰 확정 권한이 없습니다.')),
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(offerUserEmail,
+                                style: TextStyle(fontSize: 16)),
+                            // 이메일 표시
+                            Text(offerPrice, style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
