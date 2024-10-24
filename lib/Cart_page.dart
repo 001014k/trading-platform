@@ -203,6 +203,15 @@ class _CartPageState extends State<CartPage> {
                       ),
                       onPressed: () {
                         if (selectedItems.isNotEmpty) {
+                          List<Map<String, dynamic>> selectedProducts = [];
+
+                          for (String itemId in selectedItems) {
+                            final item = items.firstWhere((item) => item.id == itemId); // Find the item in the list
+                            selectedProducts.add({
+                              'productName': item['productName'] ?? '이름 없음',
+                              'productPrice': item['productPrice'] ?? 0,
+                            });
+                          }
                           showDialog(
                             context: context,
                             builder: (context) {
@@ -228,7 +237,7 @@ class _CartPageState extends State<CartPage> {
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => PaymentPage()),
+                                        MaterialPageRoute(builder: (context) => PaymentPage(selectedItems: selectedProducts)),
                                       );
                                     },
                                     child: Text(
