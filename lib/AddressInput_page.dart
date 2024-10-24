@@ -15,6 +15,7 @@ class _AddressInputPageState extends State<AddressInputPage> {
   void initState() {
     super.initState();
     _loadAddresses(); // 초기 주소 로드
+    _loadSelectedAddress(); // 선택된 주소 로드
   }
 
   // Firestore에서 주소를 로드하는 메서드
@@ -36,6 +37,34 @@ class _AddressInputPageState extends State<AddressInputPage> {
           'phone': doc['phone'] as String,     // String으로 변환
         }).toList();
       });
+    }
+  }
+
+  // Firestore에서 선택된 주소를 불러오는 메서드
+  Future<void> _loadSelectedAddress() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        _selectedAddress = snapshot['selectedAddress']; // 선택된 주소 로드
+      });
+    }
+  }
+
+  // 선택된 주소를 Firestore에 저장하는 메서드
+  Future<void> _saveSelectedAddress(String? address) async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({'selectedAddress': address}); // 선택된 주소 저장
     }
   }
 
@@ -86,8 +115,7 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
@@ -96,19 +124,15 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
-                                                color: isSelected
-                                                    ? Colors.green
-                                                    : Colors.black,
+                                                color: isSelected ? Colors.green : Colors.black,
                                               ),
                                             ),
                                             if (isSelected)
-                                              Icon(Icons.check_circle,
-                                                  color: Colors.green),
+                                              Icon(Icons.check_circle, color: Colors.green),
                                           ],
                                         ),
                                         Text('${address['phone']}'),
-                                        Text(
-                                            '${address['address']} ${address['detail']}'),
+                                        Text('${address['address']} ${address['detail']}'),
                                       ],
                                     ),
                                   ),
@@ -120,16 +144,13 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     setState(() {
-                                      _selectedAddress = isSelected
-                                          ? null
-                                          : address['address'];
+                                      _selectedAddress = isSelected ? null : address['address'];
+                                      _saveSelectedAddress(_selectedAddress); // 선택된 주소 상태를 Firestore에 저장
                                     });
-                                    Navigator.pop(context, _selectedAddress); // 선택된 주소 반환
+                                    Navigator.pop(context, _selectedAddress);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: isSelected
-                                        ? Colors.green
-                                        : Colors.grey,
+                                    backgroundColor: isSelected ? Colors.green : Colors.grey,
                                   ),
                                   child: Text(isSelected ? '선택됨' : '선택'),
                                 ),
