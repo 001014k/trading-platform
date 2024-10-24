@@ -225,7 +225,7 @@ class _BottomMenuState extends State<BottomMenu> {
           label: 'WISHLIST',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_bag),
+          icon: Icon(Icons.credit_card),
           label: 'Pay',
         ),
         BottomNavigationBarItem(
