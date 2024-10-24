@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'Payment_page.dart';
 
 class CartPage extends StatefulWidget {
   final String userId;
@@ -30,7 +31,8 @@ class _CartPageState extends State<CartPage> {
 
   // 가격을 포맷팅하는 함수
   String formattedPrice(double price) {
-    final formatter = NumberFormat.currency(locale: 'ko_KR', symbol: '₩', decimalDigits: 0);
+    final formatter =
+        NumberFormat.currency(locale: 'ko_KR', symbol: '₩', decimalDigits: 0);
     return formatter.format(price);
   }
 
@@ -74,7 +76,8 @@ class _CartPageState extends State<CartPage> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return Container(
-                      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      margin:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -108,10 +111,13 @@ class _CartPageState extends State<CartPage> {
                             child: ListTile(
                               title: Text(
                                 item['productName'],
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
                               ),
                               subtitle: Text(
-                                '가격: ${formattedPrice(item['productPrice'])}', // 포맷된 가격 표시
+                                '가격: ${formattedPrice(item['productPrice'])}',
+                                // 포맷된 가격 표시
                                 style: TextStyle(color: Colors.black),
                               ),
                               trailing: IconButton(
@@ -123,7 +129,8 @@ class _CartPageState extends State<CartPage> {
                                       return AlertDialog(
                                         title: Text(
                                           '삭제 확인',
-                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         content: Text('이 항목을 삭제하시겠습니까?'),
                                         actions: [
@@ -134,7 +141,8 @@ class _CartPageState extends State<CartPage> {
                                             },
                                             child: Text(
                                               '삭제',
-                                              style: TextStyle(color: Colors.black),
+                                              style: TextStyle(
+                                                  color: Colors.black),
                                             ),
                                           ),
                                           TextButton(
@@ -143,7 +151,8 @@ class _CartPageState extends State<CartPage> {
                                             },
                                             child: Text(
                                               '취소',
-                                              style: TextStyle(color: Colors.black),
+                                              style: TextStyle(
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ],
@@ -170,37 +179,86 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         Text(
                           '총 가격',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
                         Text(
                           formattedPrice(totalPrice), // 포맷된 총 가격 표시
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        // 배경색 설정
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        // 패딩 설정
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                        ),
+                      ),
                       onPressed: () {
                         if (selectedItems.isNotEmpty) {
                           showDialog(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: Text('결제하기'),
+                                title: Text(
+                                  '결제하기',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                                 content: Text('선택한 제품으로 결제하시겠습니까?'),
                                 actions: [
                                   TextButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      // 배경색 설정
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 12, horizontal: 24),
+                                      // 패딩 설정
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // 둥근 모서리 설정
+                                      ),
+                                    ),
                                     onPressed: () {
-                                      // 결제 처리 로직 추가
-                                      Navigator.of(context).pop();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => PaymentPage()),
+                                      );
                                     },
-                                    child: Text('결제하기'),
+                                    child: Text(
+                                      '결제하기',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                   TextButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      // 배경색 설정
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 12, horizontal: 24),
+                                      // 패딩 설정
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // 둥근 모서리 설정
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('취소'),
+                                    child: Text(
+                                      '취소',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ],
                               );
@@ -208,7 +266,11 @@ class _CartPageState extends State<CartPage> {
                           );
                         }
                       },
-                      child: Text('결제하기'),
+                      child: Text(
+                        '결제하기',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
