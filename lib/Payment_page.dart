@@ -4,14 +4,22 @@ import 'AddressInput_page.dart';
 class PaymentPage extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems; // Add this line
 
-  PaymentPage({required this.selectedItems}); // Add this line
+  PaymentPage({required this.selectedItems, this.selectedAddress}); // Remove final from selectedAddress
+
+  final String? selectedAddress; // Move this line up here
 
   @override
   _PaymentPageState createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  String _userAddress = '서울시 강남구 역삼동'; // 초기 주소
+  String? _userAddress; // 초기 주소
+
+  @override
+  void initState() {
+    super.initState();
+    _userAddress = widget.selectedAddress; // 선택된 주소 초기화
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +46,7 @@ class _PaymentPageState extends State<PaymentPage> {
             SizedBox(height: 8),
             ListTile(
               leading: Icon(Icons.location_on),
-              title: Text(_userAddress), // 저장된 주소 표시
+              title: Text(_userAddress ?? '주소를 선택하세요'),
               subtitle: Text('010-1234-5678'),
               trailing: Icon(Icons.edit, color: Colors.blue),
               onTap: () async {
@@ -52,7 +60,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 if (result != null) {
                   setState(() {
-                    _userAddress = result; // 입력된 주소를 업데이트
+                    _userAddress = result; // 선택된 주소 업데이트
                   });
                 }
               },
@@ -103,12 +111,6 @@ class _PaymentPageState extends State<PaymentPage> {
               children: widget.selectedItems.map((item) {
                 totalPrice += item['productPrice']; // Calculate total price
                 return ListTile(
-                  /*leading: Image.network(
-                    item['productImage'] ?? '', // Assuming product image URL is stored in item
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),*/
                   title: Text(item['productName']),
                   subtitle: Text('₩${item['productPrice'].toString()}'),
                   trailing: Text('수량: 1'),

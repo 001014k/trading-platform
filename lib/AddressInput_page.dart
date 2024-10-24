@@ -124,6 +124,7 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                           ? null
                                           : address['address'];
                                     });
+                                    Navigator.pop(context, _selectedAddress); // 선택된 주소 반환
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: isSelected
