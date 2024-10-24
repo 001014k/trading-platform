@@ -31,8 +31,18 @@ class _PaymentPageState extends State<PaymentPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('결제하기'),
-        backgroundColor: Colors.green,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text(
+            '결제하기',
+          style: TextStyle(
+            color: Color(0xFF3669C9),
+            fontSize: 18,
+            fontFamily: 'DM Sans',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -149,11 +159,11 @@ class _PaymentPageState extends State<PaymentPage> {
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green, // 네이버 스타일의 결제 버튼 색상
+                  backgroundColor: Colors.blue, // 네이버 스타일의 결제 버튼 색상
                 ),
                 child: Text(
                   '결제하기',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
                 ),
               ),
             ),
@@ -216,7 +226,7 @@ class _BottomMenuState extends State<BottomMenu> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_bag),
-          label: 'ORDER',
+          label: 'Pay',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle),

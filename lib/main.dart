@@ -330,7 +330,7 @@ class _BottomMenuState extends State<BottomMenu> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_bag),
-          label: 'ORDER',
+          label: 'PAY',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle),

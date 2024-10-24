@@ -76,10 +76,19 @@ class _AddressInputPageState extends State<AddressInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('배송지 목록'),
+            Text(
+                '배송지 목록',
+              style: TextStyle(
+                color: Color(0xFF3669C9),
+                fontSize: 18,
+                fontFamily: 'DM Sans',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             if (_selectedAddress != null)
               Text(
                 '선택된 주소: $_selectedAddress',
@@ -87,7 +96,8 @@ class _AddressInputPageState extends State<AddressInputPage> {
               ),
           ],
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -131,8 +141,8 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                               Icon(Icons.check_circle, color: Colors.green),
                                           ],
                                         ),
-                                        Text('${address['phone']}'),
-                                        Text('${address['address']} ${address['detail']}'),
+                                        Text('${address['phone']}',style: TextStyle(color: Colors.black),),
+                                        Text('${address['address']} ${address['detail']}',style: TextStyle(color: Colors.black),),
                                       ],
                                     ),
                                   ),
@@ -152,7 +162,7 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: isSelected ? Colors.green : Colors.grey,
                                   ),
-                                  child: Text(isSelected ? '선택됨' : '선택'),
+                                  child: Text(isSelected ? '선택됨' : '선택',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
                                 ),
                               ),
                             ],
@@ -165,8 +175,11 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                 onPressed: () {
                                   _editAddress(index); // 수정 로직 추가
                                 },
-                                icon: Icon(Icons.edit),
-                                label: Text('수정'),
+                                icon: Icon(Icons.edit,color: Colors.black,),
+                                label: Text(
+                                    '수정',
+                                  style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,
                                 ),
@@ -175,8 +188,11 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                 onPressed: () {
                                   _deleteAddress(index); // 삭제 로직 추가
                                 },
-                                icon: Icon(Icons.delete),
-                                label: Text('삭제'),
+                                icon: Icon(Icons.delete,color: Colors.black,),
+                                label: Text(
+                                    '삭제',
+                                  style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
                                 ),
@@ -206,12 +222,12 @@ class _AddressInputPageState extends State<AddressInputPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.blue,
                   padding: EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
                   '새 배송지 추가',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
                 ),
               ),
             ),
@@ -238,8 +254,17 @@ class _NewAddressPageState extends State<NewAddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('새 배송지 추가'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text(
+            '새 배송지 추가',
+          style: TextStyle(
+            color: Color(0xFF3669C9),
+            fontSize: 18,
+            fontFamily: 'DM Sans',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -316,11 +341,11 @@ class _NewAddressPageState extends State<NewAddressPage> {
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.blue,
                 ),
                 child: Text(
                   '주소 저장',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
                 ),
               ),
             ),
