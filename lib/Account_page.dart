@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:trading_platform_app/WishList_page.dart';
 import 'package:trading_platform_app/main.dart';
+import 'Payment_page.dart';
 
 class AccountPage extends StatelessWidget {
   final String userId; // 현재 사용자 ID
@@ -131,6 +132,7 @@ class BottomMenu extends StatefulWidget {
 
 class _BottomMenuState extends State<BottomMenu> {
   int _selectedIndex = 3;
+  List<Map<String, dynamic>> selectedItems = [];
 
   // Firebase Authentication에서 현재 사용자 ID 가져오기
   String userId = FirebaseAuth.instance.currentUser?.uid ?? 'defaultUserId'; // 기본값은 임의로 설정
@@ -147,6 +149,11 @@ class _BottomMenuState extends State<BottomMenu> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => WishlistPage(userId: userId)),
+        );
+      }else if (index == 2) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PaymentPage(selectedItems: selectedItems)),
         );
       }
     });

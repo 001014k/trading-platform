@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trading_platform_app/Account_page.dart';
 import 'package:trading_platform_app/all_products_page.dart';
 import 'package:trading_platform_app/main.dart';
+import 'package:trading_platform_app/payment_page.dart';
 
 // Wishlist 페이지
 class WishlistPage extends StatelessWidget {
@@ -90,6 +91,7 @@ class BottomMenu extends StatefulWidget {
 
 class _BottomMenuState extends State<BottomMenu> {
   int _selectedIndex = 1; // Wishlist가 현재 페이지이므로 index를 1로 설정
+  List<Map<String, dynamic>> selectedItems = [];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -98,6 +100,11 @@ class _BottomMenuState extends State<BottomMenu> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else if (index == 2) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PaymentPage(selectedItems: selectedItems)),
         );
       } else if (index == 3) {
         Navigator.push(

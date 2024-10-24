@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'WishList_page.dart';
 import 'Account_page.dart';
 import 'Cart_page.dart';
+import 'Payment_page.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -280,6 +281,7 @@ class BottomMenu extends StatefulWidget {
 
 class _BottomMenuState extends State<BottomMenu> {
   int _selectedIndex = 0;
+  List<Map<String, dynamic>> selectedItems = [];
 
   // Firebase Authentication에서 현재 사용자 ID 가져오기
   String userId =
@@ -296,6 +298,11 @@ class _BottomMenuState extends State<BottomMenu> {
               builder: (context) => WishlistPage(
                     userId: userId,
                   )),
+        );
+      } else if (index == 2) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PaymentPage(selectedItems: selectedItems)),
         );
       } else if (index == 3) {
         Navigator.push(

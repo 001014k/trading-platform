@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:trading_platform_app/Account_page.dart';
 import 'AddressInput_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'WishList_page.dart';
+import 'main.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems; // Add this line
@@ -156,6 +160,72 @@ class _PaymentPageState extends State<PaymentPage> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomMenu(),
     );
   }
 }
+
+class BottomMenu extends StatefulWidget {
+  @override
+  _BottomMenuState createState() => _BottomMenuState();
+}
+
+class _BottomMenuState extends State<BottomMenu> {
+  int _selectedIndex = 2;
+  List<Map<String, dynamic>> selectedItems = [];
+
+  // Firebase Authentication에서 현재 사용자 ID 가져오기
+  String userId = FirebaseAuth.instance.currentUser?.uid ?? 'defaultUserId'; // 기본값은 임의로 설정
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      if (index == 0) { // Wishlist 버튼이 눌렸을 때
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else if (index == 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => WishlistPage(userId: userId)),
+        );
+      }else if (index == 3) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountPage(userId: userId)),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'HOME',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite),
+          label: 'WISHLIST',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.shopping_bag),
+          label: 'ORDER',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.account_circle),
+          label: 'ACCOUNT',
+        ),
+      ],
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: Colors.grey,
+    );
+  }
+}
+
