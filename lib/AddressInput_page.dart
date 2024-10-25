@@ -71,7 +71,37 @@ class _AddressInputPageState extends State<AddressInputPage> {
   }
 
   // 주소 삭제 및 수정 함수
-  void _deleteAddress(int index) { /* ... */ }
+  // 주소 삭제 함수 (Firestore와 리스트에서 삭제)
+  void _deleteAddress(int index) async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      String addressToDelete = _addresses[index]['address']!;
+
+      // Firestore에서 해당 주소 삭제
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('addresses')
+          .where('address', isEqualTo: addressToDelete)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('addresses')
+            .doc(doc.id)
+            .delete();
+      }
+
+      // UI에서 삭제
+      setState(() {
+        _addresses.removeAt(index);
+      });
+    }
+  }
+
   void _editAddress(int index) { /* ... */ }
 
   @override
