@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AddressInputPage extends StatefulWidget {
   @override
@@ -250,6 +252,22 @@ class _NewAddressPageState extends State<NewAddressPage> {
   final TextEditingController _recipientController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
+  Future<void> _searchPostalCode() async {
+    // 페이지 이동 시 검색 결과를 받기
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostalCodeSearchPage(),
+      ),
+    );
+
+    if (result != null && result is Map<String, String>) {
+      setState(() {
+        _addressController.text = result['address'] ?? '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,7 +275,7 @@ class _NewAddressPageState extends State<NewAddressPage> {
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(
-            '새 배송지 추가',
+          '새 배송지 추가',
           style: TextStyle(
             color: Color(0xFF3669C9),
             fontSize: 18,
@@ -287,12 +305,34 @@ class _NewAddressPageState extends State<NewAddressPage> {
               ),
             ),
             SizedBox(height: 16),
-            TextField(
-              controller: _addressController,
-              decoration: InputDecoration(
-                labelText: '도로명 주소',
-                border: OutlineInputBorder(),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _addressController,
+                    decoration: InputDecoration(
+                      labelText: '도로명 주소',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                ElevatedButton( //_searchPostalCode, // 버튼을 누르면 주소 검색 기능 실행
+                  onPressed: () async {
+                    //주소 검색 페이지로 이동하고 선택한 주소를 받아옴
+                    final result = await Navigator.push(
+                        context,
+                      MaterialPageRoute(builder: (context) => PostalCodeSearchPage()),
+                    );
+                    if (result != null && result.containsKey('address')) {
+                      setState(() {
+                        _addressController.text = result['address'];  // 도로명 주소 필드에 값 설정
+                      });
+                    }
+                  },
+                  child: Text('우편번호 검색'),
+                ),
+              ],
             ),
             SizedBox(height: 16),
             TextField(
@@ -345,7 +385,11 @@ class _NewAddressPageState extends State<NewAddressPage> {
                 ),
                 child: Text(
                   '주소 저장',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
@@ -356,3 +400,81 @@ class _NewAddressPageState extends State<NewAddressPage> {
   }
 }
 
+// 우편번호 검색 페이지
+class PostalCodeSearchPage extends StatefulWidget {
+  @override
+  _PostalCodeSearchPageState createState() => _PostalCodeSearchPageState();
+}
+
+class _PostalCodeSearchPageState extends State<PostalCodeSearchPage> {
+  final TextEditingController _searchController = TextEditingController();
+  List<dynamic> _results = [];
+
+  Future<void> searchPostalCode(String query) async {
+    final apiKey = 'f072c9394405df675d8e7980d2936d87';  // 발급받은 Kakao REST API 키 사용
+    final url = 'https://dapi.kakao.com/v2/local/search/address.json?query=$query';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'KakaoAK $apiKey'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        _results = data['documents'];
+      });
+    } else {
+      throw Exception('Failed to load postal codes');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('우편번호 검색'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: '주소 검색',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                searchPostalCode(_searchController.text);
+              },
+              child: Text('검색'),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _results.length,
+                itemBuilder: (context, index) {
+                  final result = _results[index];
+                  final roadAddress = result['road_address'];
+                  final zoneNo = roadAddress != null ? roadAddress['zone_no'] : '우편번호 없음';
+                  return ListTile(
+                    title: Text(result['address_name']),
+                    subtitle: Text(zoneNo),
+                    onTap: () {
+                      Navigator.pop(context, {
+                        'address': result['address_name'],  // 선택한 주소를 반환
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
