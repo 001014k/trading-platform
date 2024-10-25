@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'EditAddress_page.dart';
 
 class AddressInputPage extends StatefulWidget {
   @override
@@ -70,7 +71,6 @@ class _AddressInputPageState extends State<AddressInputPage> {
     }
   }
 
-  // 주소 삭제 및 수정 함수
   // 주소 삭제 함수 (Firestore와 리스트에서 삭제)
   void _deleteAddress(int index) async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -102,13 +102,33 @@ class _AddressInputPageState extends State<AddressInputPage> {
     }
   }
 
-  void _editAddress(int index) { /* ... */ }
+  // 주소 수정 함수 (수정 페이지로 이동)
+  void _editAddress(int index) async {
+    final addressData = _addresses[index];
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditAddressPage(
+          addressData: addressData, // 수정할 주소 데이터를 전달
+          index: index, // 인덱스를 전달
+        ),
+      ),
+    );
+
+    // 수정된 주소 정보를 Firestore에서 다시 로드하지 않고 직접 업데이트
+    if (result != null) {
+      setState(() {
+        _addresses[index] = result; // 수정된 주소 정보로 리스트 업데이트
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -358,7 +378,13 @@ class _NewAddressPageState extends State<NewAddressPage> {
                       });
                     }
                   },
-                  child: Text('우편번호 검색'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: Text(
+                      '우편번호 검색',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
+                  ),
                 ),
               ],
             ),
