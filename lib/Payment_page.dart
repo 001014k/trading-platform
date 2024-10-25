@@ -34,6 +34,37 @@ class _PaymentPageState extends State<PaymentPage> {
     _userAddress = widget.selectedAddress; // 선택된 주소 초기화
   }
 
+  // 특정 결제 문서에서 특정 상품 삭제 메서드
+  Future<void> _deleteProductFromPayment(String paymentId, Map<String, dynamic> productToDelete) async {
+    try {
+      // 결제 문서 가져오기
+      DocumentSnapshot paymentSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .collection('payments')
+          .doc(paymentId)
+          .get();
+
+      if (paymentSnapshot.exists) {
+        // Firestore에서 해당 제품을 삭제하기
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser?.uid)
+            .collection('payments')
+            .doc(paymentId)
+            .update({
+          'products': FieldValue.arrayRemove([productToDelete]) // 해당 제품을 삭제
+        });
+
+        // UI 업데이트
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error deleting product: $e');
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double totalPrice = 0.0; // To calculate total price from selected items
@@ -171,7 +202,19 @@ class _PaymentPageState extends State<PaymentPage> {
                               return ListTile(
                                 title: Text(item['productName']),
                                 subtitle: Text(_currencyFormat.format(item['productPrice'])),
-                                trailing: Text('수량: ${item['quantity'] ?? 1}'), // 수량이 있다면 표시
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('수량: ${item['quantity'] ?? 1}'),
+                                    IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () {
+                                        // 삭제 버튼 클릭 시
+                                        _deleteProductFromPayment(paymentDoc.id, item);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               );
                             }).toList(),
                           ),
