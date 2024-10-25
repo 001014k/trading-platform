@@ -91,11 +91,6 @@ class _AddressInputPageState extends State<AddressInputPage> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            if (_selectedAddress != null)
-              Text(
-                '선택된 주소: $_selectedAddress',
-                style: TextStyle(fontSize: 12),
-              ),
           ],
         ),
         backgroundColor: Colors.white,
