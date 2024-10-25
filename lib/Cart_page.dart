@@ -172,9 +172,7 @@ class _CartPageState extends State<CartPage> {
                                       return AlertDialog(
                                         title: Text(
                                           '삭제 확인',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                          style: TextStyle(fontWeight: FontWeight.bold),),
                                         content: Text('이 항목을 삭제하시겠습니까?'),
                                         actions: [
                                           TextButton(
@@ -182,20 +180,38 @@ class _CartPageState extends State<CartPage> {
                                               deleteItem(item.id);
                                               Navigator.of(context).pop();
                                             },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              // 배경색 설정
+                                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                              // 패딩 설정
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                              ),
+                                            ),
                                             child: Text(
                                               '삭제',
                                               style: TextStyle(
-                                                  color: Colors.black),
+                                                  color: Colors.black,fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           TextButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              // 배경색 설정
+                                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                              // 패딩 설정
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8), // 둥근 모서리 설정
+                                              ),
+                                            ),
                                             child: Text(
                                               '취소',
                                               style: TextStyle(
-                                                  color: Colors.black),
+                                                  color: Colors.black,fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                         ],
