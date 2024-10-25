@@ -47,6 +47,9 @@ class _PaymentPageState extends State<PaymentPage> {
 
       if (paymentSnapshot.exists) {
         // Firestore에서 해당 제품을 삭제하기
+        Map<String, dynamic>? data = paymentSnapshot.data() as Map<String, dynamic>?; // 캐스팅 추가
+        List<dynamic> products = data?['products'] ?? []; // 데이터를 Map으로 캐스팅한 후 접근
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -55,6 +58,17 @@ class _PaymentPageState extends State<PaymentPage> {
             .update({
           'products': FieldValue.arrayRemove([productToDelete]) // 해당 제품을 삭제
         });
+
+        // 삭제 후, 상품이 모두 삭제되었는지 확인
+        if (products.length == 1) { // 삭제 전 상품이 1개일 경우
+          // 해당 결제 문서 삭제
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser?.uid)
+              .collection('payments')
+              .doc(paymentId)
+              .delete();
+        }
 
         // UI 업데이트
         setState(() {});
