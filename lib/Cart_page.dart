@@ -18,16 +18,41 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> deleteItem(String docId) async {
     try {
-      await FirebaseFirestore.instance
+      // 먼저, 사용자 장바구니에서 제품 정보를 가져옵니다.
+      final cartDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userId)
           .collection('cart')
           .doc(docId)
-          .delete();
+          .get();
+
+      // 장바구니에 있는 제품 정보가 존재하는지 확인
+      if (cartDoc.exists) {
+        // 제품 ID를 가져옵니다.
+        final productId = cartDoc['productId']; // 제품 ID 필드 이름이 'productId'라고 가정합니다.
+
+        // 제품 상태를 false로 업데이트합니다.
+        await FirebaseFirestore.instance
+            .collection('products') // 제품 컬렉션
+            .doc(productId) // 제품 ID
+            .update({
+          'isBidConfirmed': false, // 상태를 false로 설정
+        });
+
+        // 이후에 사용자 장바구니에서 해당 제품 삭제
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.userId)
+            .collection('cart')
+            .doc(docId)
+            .delete();
+      }
     } catch (e) {
-      print('삭제 오류: $e');
+      print('오류 발생: $e');
     }
   }
+
+
 
   Future<void> _addPaymentInfo(List<Map<String, dynamic>> selectedProducts) async {
     try {
