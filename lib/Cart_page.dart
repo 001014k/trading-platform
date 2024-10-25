@@ -251,6 +251,7 @@ class _CartPageState extends State<CartPage> {
                           for (String itemId in selectedItems) {
                             final item = items.firstWhere((item) => item.id == itemId); // Find the item in the list
                             selectedProducts.add({
+                              'productId': item.id, // 제품 ID 추가
                               'productName': item['productName'] ?? '이름 없음',
                               'productPrice': item['productPrice'] ?? 0,
                             });
