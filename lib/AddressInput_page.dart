@@ -154,7 +154,10 @@ class _AddressInputPageState extends State<AddressInputPage> {
                                       _selectedAddress = isSelected ? null : address['address'];
                                       _saveSelectedAddress(_selectedAddress); // 선택된 주소 상태를 Firestore에 저장
                                     });
-                                    Navigator.pop(context, _selectedAddress);
+                                    Navigator.pop(context, {
+                                      'address': address['address'],  // 주소
+                                      'phone': address['phone'],      // 전화번호
+                                    });
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: isSelected ? Colors.green : Colors.grey,
