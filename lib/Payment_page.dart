@@ -4,6 +4,7 @@ import 'AddressInput_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'WishList_page.dart';
 import 'main.dart';
+import 'package:intl/intl.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems; // Add this line
@@ -18,6 +19,12 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   String? _userAddress; // 초기 주소
+  String? _userPhone;
+  final NumberFormat _currencyFormat = NumberFormat.currency(
+    locale: 'ko_KR', // 한국 원화에 맞는 로케일
+    symbol: '₩',     // 통화 기호
+    decimalDigits: 0, // 소수점 자리 제거
+  );
 
   @override
   void initState() {
@@ -61,7 +68,7 @@ class _PaymentPageState extends State<PaymentPage> {
             ListTile(
               leading: Icon(Icons.location_on),
               title: Text(_userAddress ?? '주소를 선택하세요'),
-              subtitle: Text('010-1234-5678'),
+              subtitle: Text(_userPhone ?? '전화번호를 입력하세요'),
               trailing: Icon(Icons.edit, color: Colors.blue),
               onTap: () async {
                 // 주소 입력 페이지로 이동하고 입력된 주소 받아오기
@@ -74,7 +81,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 if (result != null) {
                   setState(() {
-                    _userAddress = result; // 선택된 주소 업데이트
+                    _userAddress = result['address'];  // result에서 'address' 키로 주소 가져오기
+                    _userPhone = result['phone'];      // result에서 'phone' 키로 전화번호 가져오기
                   });
                 }
               },
@@ -126,7 +134,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 totalPrice += item['productPrice']; // Calculate total price
                 return ListTile(
                   title: Text(item['productName']),
-                  subtitle: Text('₩${item['productPrice'].toString()}'),
+                  subtitle: Text(_currencyFormat.format(item['productPrice'])), // 포맷된 가격
                   trailing: Text('수량: 1'),
                 );
               }).toList(),
@@ -143,7 +151,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '₩${totalPrice.toString()}',
+                  _currencyFormat.format(totalPrice), // 포맷된 총 가격
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
                 ),
               ],
