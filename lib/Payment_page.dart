@@ -42,7 +42,7 @@ class _PaymentPageState extends State<PaymentPage> {
         backgroundColor: Colors.white,
         elevation: 1,
         title: Text(
-            '결제하기',
+            'PAY',
           style: TextStyle(
             color: Color(0xFF3669C9),
             fontSize: 18,
