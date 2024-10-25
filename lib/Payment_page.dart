@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'WishList_page.dart';
 import 'main.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems; // Add this line
@@ -129,34 +131,62 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
             ),
             SizedBox(height: 8),
-            Column(
-              children: widget.selectedItems.map((item) {
-                totalPrice += item['productPrice']; // Calculate total price
-                return ListTile(
-                  title: Text(item['productName']),
-                  subtitle: Text(_currencyFormat.format(item['productPrice'])), // 포맷된 가격
-                  trailing: Text('수량: 1'),
-                );
-              }).toList(),
-            ),
-            Divider(),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser?.uid)
+                    .collection('payments')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-            // 총 결제 금액 섹션
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '총 결제 금액',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  _currencyFormat.format(totalPrice), // 포맷된 총 가격
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
-                ),
-              ],
+                  if (snapshot.hasError) {
+                    return Center(child: Text('오류가 발생했습니다.'));
+                  }
+
+                  final payments = snapshot.data?.docs ?? [];
+                  if (payments.isEmpty) {
+                    return Center(child: Text('결제 기록이 없습니다.'));
+                  }
+
+                  return ListView(
+                    children: payments.map((paymentDoc) {
+                      final data = paymentDoc.data() as Map<String, dynamic>;
+                      List<dynamic> products = data['products'] ?? [];
+                      double paymentTotalPrice = data['totalPrice'] ?? 0;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '결제일: ${DateFormat('yyyy-MM-dd HH:mm:ss').format((data['timestamp'] as Timestamp).toDate())}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Column(
+                            children: products.map((item) {
+                              totalPrice += item['productPrice']; // Calculate total price
+                              return ListTile(
+                                title: Text(item['productName']),
+                                subtitle: Text(_currencyFormat.format(item['productPrice'])),
+                                trailing: Text('수량: ${item['quantity'] ?? 1}'), // 수량이 있다면 표시
+                              );
+                            }).toList(),
+                          ),
+                          Text(
+                            '총 결제 금액: ${_currencyFormat.format(paymentTotalPrice)}',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                          ),
+                          Divider(),
+                        ],
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ),
-            SizedBox(height: 16),
 
             // 결제 버튼
             SizedBox(

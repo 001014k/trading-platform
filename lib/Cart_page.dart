@@ -29,6 +29,24 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
+  Future<void> _addPaymentInfo(List<Map<String, dynamic>> selectedProducts) async {
+    try {
+      // 현재 로그인한 사용자 문서에 결제 정보 추가
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userId)
+          .collection('payments') // 'payments'라는 서브 컬렉션에 결제 정보 저장
+          .add({
+        'products': selectedProducts,
+        'totalPrice': totalPrice,
+        'timestamp': FieldValue.serverTimestamp(), // 결제 시간 추가
+      });
+    } catch (e) {
+      print('결제 정보 추가 오류: $e');
+    }
+  }
+
+
   // 가격을 포맷팅하는 함수
   String formattedPrice(double price) {
     final formatter =
@@ -234,7 +252,8 @@ class _CartPageState extends State<CartPage> {
                                             8), // 둥근 모서리 설정
                                       ),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      await _addPaymentInfo(selectedProducts); // 결제 정보 추가
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => PaymentPage(selectedItems: selectedProducts)),
